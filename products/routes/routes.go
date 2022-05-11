@@ -1,13 +1,16 @@
 package routes
 
 import (
-	"net/http"
 	"products/controllers"
+	"github.com/julienschmidt/httprouter"
 )
 
-func LoadRoutes() {
-	http.HandleFunc("/", controllers.CreateProduct)
-	http.HandleFunc("/:id", controllers.UpdateProduct)
-	http.HandleFunc("/products", controllers.AllProducts)
-	http.HandleFunc("/product/:id", controllers.GetProduct)
+func Router() *httprouter.Router {
+	router := httprouter.New()
+	router.POST("/products", controllers.CreateProduct)
+	router.PUT("/:id", controllers.UpdateProduct)
+    router.GET("/products", controllers.AllProducts)
+	router.GET("/products/:id", controllers.GetProduct)
+
+	return router
 }

@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"net/http"
 	"products/models"
+
+	"github.com/julienschmidt/httprouter"
 )
 
-func AllProducts(w http.ResponseWriter, r *http.Request) {
+
+func AllProducts(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	products := models.GetAllProducts()
 	w.Header().Set("Content-type", "application/json")
 
@@ -23,9 +26,8 @@ func AllProducts(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
-func GetProduct(w http.ResponseWriter, r *http.Request) {
-	params := r.URL.Query()
-	id := params.Get("id")
+func GetProduct(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id := ps.ByName("id")
 
 	product := models.GetProduct(id)
 	
@@ -44,7 +46,7 @@ func GetProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 
-func CreateProduct(w http.ResponseWriter, r *http.Request) {
+func CreateProduct(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	body, err := r.GetBody()
 
 	if(err != nil){
@@ -67,7 +69,7 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
 	w.Write(data)
 }
 
-func UpdateProduct(w http.ResponseWriter, r *http.Request) {
+func UpdateProduct(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	body, err := r.GetBody()
 
 	if(err != nil){

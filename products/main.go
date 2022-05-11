@@ -7,6 +7,5 @@ import (
 )
 
 func main() {
-	routes.LoadRoutes()
-    log.Fatal(http.ListenAndServe(":8000", nil))
+    log.Fatal(http.ListenAndServe(":8000", routes.Router()))
 }
