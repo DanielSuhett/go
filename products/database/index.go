@@ -3,8 +3,8 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"time"
 	_ "github.com/go-sql-driver/mysql"
+	"time"
 )
 
 func Connect() *sql.DB {
@@ -23,9 +23,9 @@ func Connect() *sql.DB {
 	return db
 }
 
-func Query(request string) (*sql.Rows, error) {
+func Query(fields string, where string) (*sql.Rows, error) {
 	db := Connect()
-	rows, err := db.Query(request)
+	rows, err := db.Query(fmt.Sprintf("select %v from Products %v", fields, where))
 
 	if err != nil {
 		return nil, error(err)

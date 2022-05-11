@@ -14,7 +14,7 @@ type Product struct {
 }
 
 func GetAllProducts() []Product {
-	rows, err := db.Query("select * from Products")
+	rows, err := db.Query("*", "")
 
 	if err != nil {
 		panic(err)
@@ -42,9 +42,9 @@ func GetAllProducts() []Product {
 }
 
 func GetProduct(id string) Product {
-	query := fmt.Sprintf("select * from Products where id = %v", id)
+	where := fmt.Sprintf("where id = %v", id)
 
-	rows, err := db.Query(query)
+	rows, err := db.Query("*", where)
 
 	if err != nil {
 		panic(err)
