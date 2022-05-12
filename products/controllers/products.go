@@ -3,9 +3,10 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"products/database"
 	"products/models"
-
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -47,14 +48,18 @@ func GetProduct(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 
 func CreateProduct(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	body, err := r.GetBody()
+	var product database.Product
 
+	body, _ := ioutil.ReadAll(r.Body)
+    err := json.Unmarshal(body, &product)
+
+	
 	if(err != nil){
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 	}
 
-	product := models.CreateProduct(body)
+	models.CreateProduct(product)
 	
 	w.Header().Set("Content-type", "application/json")
 

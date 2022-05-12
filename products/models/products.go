@@ -71,10 +71,14 @@ func GetProduct(id string) Product {
 	return product
 }
 
-func CreateProduct(data ...interface{}) Product {
-	product := Product{}
+func CreateProduct(values db.Product) {
+	product := db.Product{Name: values.Name, Description: values.Description, Price: values.Price, Quantity: values.Quantity}
 
-	return product
+	_, err := db.Insert("name, description, price, quantity", product)
+
+	if err != nil {
+		panic(err)
+	}
 }
 
 func UpdateProduct(data ...interface{}) Product {
