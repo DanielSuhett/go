@@ -64,3 +64,23 @@ func Insert(fields string, values interface{}) (sql.Result, error) {
 
 	return result, nil
 }
+
+func Delete(id int) error {
+	db := Connect()
+
+	delete, err := db.Prepare("delete from Products where id = ?")
+
+	if err != nil {
+		return error(err)
+	}
+
+	_, erroexec := delete.Exec(id)
+
+	if erroexec != nil {
+		return error(err)
+	}
+
+	defer db.Close()
+
+	return nil
+}

@@ -11,6 +11,7 @@ func Router() *httprouter.Router {
     router.GET("/products", controllers.AllProducts)
 	router.PUT("/products/:id", controllers.UpdateProduct)
 	router.GET("/products/:id", controllers.GetProduct)
+	router.DELETE("/products/:id", controllers.DeleteProduct)
 
 	return router
 }

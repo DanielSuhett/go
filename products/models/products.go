@@ -13,11 +13,11 @@ type Product struct {
 	Quantity    int
 }
 
-func GetAllProducts() []Product {
+func GetAllProducts() ([]Product, error) {
 	rows, err := db.Query("*", "")
 
 	if err != nil {
-		panic(err)
+		return nil, error(err)
 	}
 
 	products := []Product{}
@@ -32,22 +32,22 @@ func GetAllProducts() []Product {
 		err := rows.Scan(&id, &name, &description, &price, &quantity)
 
 		if err != nil {
-			panic(err)
+			return nil, error(err)
 		}
 
 		products = append(products, Product{id, name, description, price, quantity})
 	}
 
-	return products
+	return products, nil
 }
 
-func GetProduct(id string) Product {
+func GetProduct(id string) (*Product, error) {
 	where := fmt.Sprintf("where id = %v", id)
 
 	rows, err := db.Query("*", where)
 
 	if err != nil {
-		panic(err)
+		return nil, error(err)
 	}
 
 	product := Product{}
@@ -62,23 +62,35 @@ func GetProduct(id string) Product {
 		err := rows.Scan(&id, &name, &description, &price, &quantity)
 
 		if err != nil {
-			panic(err)
+			return nil, error(err)
 		}
 
 		product = Product{id, name, description, price, quantity}
 	}
 
-	return product
+	return &product, nil
 }
 
-func CreateProduct(values db.Product) {
+func CreateProduct(values db.Product) error {
 	product := db.Product{Name: values.Name, Description: values.Description, Price: values.Price, Quantity: values.Quantity}
 
 	_, err := db.Insert("name, description, price, quantity", product)
 
 	if err != nil {
-		panic(err)
+		return error(err)
 	}
+
+	return nil
+}
+
+func DeleteProduct(id int) (error) {
+	err := db.Delete(id)
+
+	if err != nil {
+		return error(err)
+	}
+
+	return nil
 }
 
 func UpdateProduct(data ...interface{}) Product {
