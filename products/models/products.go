@@ -93,8 +93,15 @@ func DeleteProduct(id int) (error) {
 	return nil
 }
 
-func UpdateProduct(data ...interface{}) Product {
-	product := Product{}
+func UpdateProduct(id string, values db.Product) error {
+	product := db.Product{Name: values.Name, Description: values.Description, Price: values.Price, Quantity: values.Quantity}
 
-	return product
+	_, err := db.Update(id, product)
+
+	if err != nil {
+		return error(err)
+	}
+
+
+	return nil
 }

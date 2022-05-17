@@ -3,8 +3,8 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"time"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type Product struct {
@@ -55,6 +55,28 @@ func Insert(fields string, values interface{}) (sql.Result, error) {
 	product := values.(Product)
 
 	result, err := insert.Exec(product.Name, product.Description, product.Price, product.Quantity)
+
+	if err != nil {
+		return nil, error(err)
+	}
+
+	defer db.Close()
+
+	return result, nil
+}
+
+func Update(id string, values interface{}) (sql.Result, error) {
+	db := Connect()
+
+	update, err := db.Prepare(fmt.Sprintf("update Products set name = ?, description = ?,  price = ?, quantity = ? where id = %v", id))
+
+	if err != nil {
+		return nil, error(err)
+	}
+
+	product := values.(Product)
+
+	result, err := update.Exec(product.Name, product.Description, product.Price, product.Quantity)
 
 	if err != nil {
 		return nil, error(err)
