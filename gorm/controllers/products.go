@@ -2,22 +2,21 @@ package controllers
 
 import (
 	"encoding/json"
+	"github.com/julienschmidt/httprouter"
+	"gorm/database"
+	"gorm/models"
 	"io/ioutil"
 	"net/http"
-	"products/database"
-	"products/models"
-	"strconv"
-
-	"github.com/julienschmidt/httprouter"
 )
 
-
 func AllProducts(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	products, err := models.GetAllProducts()
+	var products []models.Product
 
-	if(err != nil){
+	result := database.DB.Find(&products)
+
+	if result.Error != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		w.Write([]byte(result.Error.Error()))
 	}
 
 	w.Header().Set("Content-type", "application/json")
@@ -30,13 +29,15 @@ func AllProducts(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 func GetProduct(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	id := ps.ByName("id")
 
-	product, err := models.GetProduct(id)
+	var product models.Product
 
-	if(err != nil){
+	result := database.DB.Find(&product, id).Limit(1)
+
+	if result.Error != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		w.Write([]byte(result.Error.Error()))
 	}
-	
+
 	w.Header().Set("Content-type", "application/json")
 
 	data, _ := json.Marshal(product)
@@ -44,74 +45,66 @@ func GetProduct(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Write(data)
 }
 
-
 func CreateProduct(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var product database.Product
+	var product models.Product
 
 	body, _ := ioutil.ReadAll(r.Body)
-    err := json.Unmarshal(body, &product)
+	err := json.Unmarshal(body, &product)
 
-	
-	if(err != nil){
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
 	}
 
-	fail := models.CreateProduct(product)
+	result := database.DB.Create(&product)
 
-	if(fail != nil){
+	if result.Error != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(fail.Error()))
+		w.Write([]byte(result.Error.Error()))
 	}
-	
+
 	w.Header().Set("Content-type", "application/json")
 
 	data, _ := json.Marshal(product)
 
-	w.WriteHeader(201)
+	w.WriteHeader(http.StatusCreated)
 	w.Write(data)
 }
 
 func UpdateProduct(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var product database.Product
+	var product models.Product
 	id := ps.ByName("id")
 
-
 	body, _ := ioutil.ReadAll(r.Body)
-    err := json.Unmarshal(body, &product)
+	err := json.Unmarshal(body, &product)
 
-	
-	if(err != nil){
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
 	}
 
-	fail := models.UpdateProduct(id, product)
+	result := database.DB.Model(models.Product{}).Where("id = ?", id).Updates(&product)
 
-	if(fail != nil){
+	if result.Error != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(fail.Error()))
+		w.Write([]byte(result.Error.Error()))
 	}
 
 	w.Header().Set("Content-type", "application/json")
 
 	data, _ := json.Marshal(product)
 
-	w.WriteHeader(200)
 	w.Write(data)
 }
 
-
 func DeleteProduct(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	param := ps.ByName("id")
+	id := ps.ByName("id")
 
-	id, _ := strconv.Atoi(param)
+	result := database.DB.Delete(models.Product{}, id)
 
-	err := models.DeleteProduct(id)
-	
-	if(err != nil){
+	if result.Error != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		w.Write([]byte(result.Error.Error()))
 	}
 
 	w.WriteHeader(http.StatusOK)
