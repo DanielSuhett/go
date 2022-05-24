@@ -11,7 +11,7 @@ import (
 
 func AddController(c *gin.Context) {
 	var customer entities.CreateCustomer
-	service, err := services.NewOrderService()
+	service, err := services.Run()
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})

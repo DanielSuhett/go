@@ -15,7 +15,7 @@ type CustomerService struct {
 
 type Service func(cs *CustomerService) error
 
-func NewOrderService() (*CustomerService, error) {
+func Run() (*CustomerService, error) {
 	s := &CustomerService{}
 
 	cs, err := impl.Connect(context.Background())
