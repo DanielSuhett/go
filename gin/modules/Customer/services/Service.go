@@ -54,3 +54,18 @@ func (c *CustomerService) GetCustomer(id string) (*entities.Customer, error) {
 
 	return customer, nil
 }
+
+func (c *CustomerService) UpdateCustomer(id string, name string, email string, address interface{}) error {
+	addr := address.(entities.Address)
+	addresses := []entities.Address{addr}
+
+	customer := entities.Customer{Name: name, Email: email, Addresses: addresses}
+
+	err := c.customers.Update(id, customer)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
