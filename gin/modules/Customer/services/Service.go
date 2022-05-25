@@ -7,6 +7,7 @@ import (
 	"github.com/DanielSuhett/go/gin/modules/Customer/domain/entities"
 	"github.com/DanielSuhett/go/gin/modules/Customer/domain/repositories"
 	impl "github.com/DanielSuhett/go/gin/modules/Customer/infra"
+	"github.com/google/uuid"
 )
 
 type CustomerService struct {
@@ -28,13 +29,11 @@ func Run() (*CustomerService, error) {
 	return s, nil
 }
 
-
-
 func (c *CustomerService) CreateCustomer(name string, email string, address interface{}) error {
 	addr := address.(entities.Address)
 	addresses := []entities.Address{addr}
 
-	customer := entities.Customer{Name: name, Email: email, Addresses: addresses}
+	customer := entities.Customer{ID: uuid.NewString(), Name: name, Email: email, Addresses: addresses}
 
 	err := c.customers.Add(customer)
 
@@ -44,4 +43,14 @@ func (c *CustomerService) CreateCustomer(name string, email string, address inte
 	}
 
 	return nil
+}
+
+func (c *CustomerService) GetCustomer(id string) (*entities.Customer, error) {
+	customer, err := c.customers.Get(id)
+
+	if err != nil {
+		return customer, err
+	}
+
+	return customer, nil
 }
