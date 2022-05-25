@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/DanielSuhett/go/gin/modules/Customer/domain/entities"
-	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -14,7 +13,7 @@ import (
 var ctx = context.TODO()
 
 type MongoRepository struct {
-	db *mongo.Database
+	db       *mongo.Database
 	customer *mongo.Collection
 }
 
@@ -27,7 +26,7 @@ func Connect(ctx context.Context) (*MongoRepository, error) {
 		return &MongoRepository{}, err
 	}
 
-	database :=  client.Database("gin")
+	database := client.Database("gin")
 	customer := database.Collection("customers")
 
 	return &MongoRepository{db: database, customer: customer}, nil
@@ -39,10 +38,10 @@ func (mr *MongoRepository) Add(customer entities.Customer) error {
 	return err
 }
 
-func (mr *MongoRepository) Get(ID uuid.UUID) (*entities.Customer, error) {
+func (mr *MongoRepository) Get(id string) (*entities.Customer, error) {
 	var customer *entities.Customer
 
-	err := mr.customer.FindOne(ctx, ID).Decode(&customer)
+	err := mr.customer.FindOne(ctx, bson.D{{Key: "uuid", Value: id}}).Decode(&customer)
 
 	if err != nil {
 		return customer, err
@@ -51,7 +50,7 @@ func (mr *MongoRepository) Get(ID uuid.UUID) (*entities.Customer, error) {
 	return customer, nil
 }
 
-func (mr *MongoRepository) Update(ID uuid.UUID, customer entities.Customer) error {
+func (mr *MongoRepository) Update(id string, customer entities.Customer) error {
 	c, err := bson.Marshal(customer)
 
 	if err != nil {
@@ -66,7 +65,7 @@ func (mr *MongoRepository) Update(ID uuid.UUID, customer entities.Customer) erro
 		return err
 	}
 
-	filter := bson.D{{Key: "_id", Value: ID}}
+	filter := bson.D{{Key: "uuid", Value: id}}
 	_, err = mr.customer.UpdateOne(ctx, filter, bson.D{{Key: "$set", Value: update}})
 
 	if err != nil {

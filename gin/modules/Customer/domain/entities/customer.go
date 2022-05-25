@@ -1,11 +1,7 @@
 package entities
 
-import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
-)
-
 type Customer struct {
-	ID        primitive.ObjectID `bson:"_id,omitempty"`
+	ID        string `bson:"uuid,omitempty"`
 	Name      string
 	Email     string
 	Addresses []Address
