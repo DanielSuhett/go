@@ -1,39 +1,26 @@
 package main
 
 import (
-	"cron-postgres/repository"
 	"fmt"
 	"log"
+	"postgres/database"
+	"postgres/models"
 
 	_ "github.com/lib/pq"
 )
 
-type Env struct {
-	db *repository.Database
-}
-
 func main() {
-	db, err := repository.Connect()
+	db, err := database.Connect()
 
 	if err != nil {
 		log.Panic(err)
 	}
 
-	env := &Env{db}
+	defer db.Close()
 
-	env.Search()
+	postService := &models.Database{DB: db}
 
-	repository.Close(db)
-}
+	post, _ := postService.GetPost(1)
 
-func (env *Env) Search() {
-	posts, err := env.db.GetPosts()
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, post := range posts {
-		fmt.Printf("%v - %v\n", post.Title, post.Text)
-	}
+	fmt.Println(post)
 }
