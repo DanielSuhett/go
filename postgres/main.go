@@ -1,26 +1,19 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"log"
-	"postgres/database"
-	"postgres/models"
-
-	_ "github.com/lib/pq"
+	"postgres/config"
+	"postgres/repositories"
 )
 
 func main() {
-	db, err := database.Connect()
+	repo := repositories.New(repositories.Options{
+		Writer: config.GetWriterSqlx(),
+		Reader: config.GetReaderSqlx(),
+	})
 
-	if err != nil {
-		log.Panic(err)
-	}
+	v, _ := repo.Post.Get(context.Background(), 1)
 
-	defer db.Close()
-
-	postService := &models.Database{DB: db}
-
-	post, _ := postService.GetPost(1)
-
-	fmt.Println(post)
+	fmt.Println(v)
 }
